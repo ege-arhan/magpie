@@ -3576,3 +3576,16 @@ func askUnlisted(order, left []Weighed, c candidate, ws []Weighed) ([]Weighed, [
 	}
 	return slices.Concat(order[:at+1], ws, order[at+1:]), left
 }
+
+// fallbackKey marks a try made with a later candidate to fall back to.
+type fallbackKey struct{}
+
+func withFallback(ctx context.Context) context.Context {
+	return context.WithValue(ctx, fallbackKey{}, true)
+}
+
+func hasFallback(ctx context.Context) bool {
+	v, _ := ctx.Value(fallbackKey{}).(bool)
+	return v
+}
+

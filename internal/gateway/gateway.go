@@ -2911,6 +2911,9 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request, from provider.Pro
 			if ultra && from == provider.Anthropic {
 				ctx = withUltra(ctx)
 			}
+			if !last {
+				ctx = withFallback(ctx)
+			}
 			hw.stop = stop
 			if autoPicks(c) {
 				// the reply names the pick it went as last (#256: it
@@ -4385,6 +4388,9 @@ func (s *Server) forwardOnce(ctx context.Context, p provider.Provider, to provid
 	if p.IsPlugin() {
 		req.Header.Set(provider.ConversationHeader, conversationID(in, body))
 		tellWorkPlace(req.Header, to, body)
+		if hasFallback(ctx) {
+			req.Header.Set(provider.FallbackHeader, "1")
+		}
 	}
 	if p.IsRemoteMagpie() {
 		passOnCaller(ctx, req)
